@@ -12,7 +12,7 @@ update
 
 start
 {
-	return current.progression == 30;
+	return old.progression == 0 && (old.progression != current.progression);
 }
 
 isLoading
