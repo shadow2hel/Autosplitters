@@ -1,7 +1,7 @@
 state("DyingLightGame")
 {
-	int progression : "gamedll_x64_rwdi.dll", 0x1D69420;
-	int qte : "gamedll_x64_rwdi.dll", 0x1C679D0, 0x780, 0xB98, 0xB8;
+	int progression : "gamedll_x64_rwdi.dll", 0x1D6D530;
+	int qte : "gamedll_x64_rwdi.dll", 0x1C6B9D0, 0x780, 0xB98, 0xB8;
 }
 
 update
@@ -86,7 +86,7 @@ update
 					checkpointBase += 3, // "Get to the tunnel" // + 3
 					checkpointBase += 3, // "Run to Old Town" // + 3
 					checkpointBase += 11, // "Get to Troy" // + 11
-					checkpointBase += 72, // "Go to University" // + 9
+					checkpointBase += 72, // "Go to University" // + 68
 					checkpointBase += 15, // "Get to sewers" // + 15
 					checkpointBase += 5, // "Meet chicken shit Michael" // + 5
 					checkpointBase += 6, // "Smiley Face" // + 6
@@ -107,7 +107,6 @@ update
 		vars.endQteCompleted = 0;
 		vars.used = false;
 		vars.baseFound = false;
-		vars.anomaly = false;
 		vars.split = 0;
 		vars.checkpoints = null;
 	}
@@ -118,13 +117,12 @@ startup
 	vars.endQteCompleted = 0;
 	vars.used = false;
 	vars.baseFound = false;
-	vars.anomaly = false;
 	vars.split = 0;
 }
 
 split
 {	
-	if(vars.baseFound && vars.checkpoints.Length > 0){
+	if(vars.baseFound && vars.checkpoints.Length != null){
 		if(vars.split < vars.checkpoints.Length){
 			if(current.progression == vars.checkpoints[vars.split]){
 				vars.split++;
