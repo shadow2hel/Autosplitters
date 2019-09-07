@@ -1,6 +1,6 @@
 state("DyingLightGame")
 {
-	int progression : "gamedll_x64_rwdi.dll", 0x1D6D530;
+	int progression : "gamedll_x64_rwdi.dll", 0x1D6D540;
 	int loading: "rd3d11_x64_rwdi.dll", 0x7D108; // Thanks to Mr.Brood for this one.
 }
 
