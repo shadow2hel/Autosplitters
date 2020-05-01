@@ -1,22 +1,19 @@
 state("DyingLightGame")
 {
-	//old int progression : "gamedll_x64_rwdi.dll", 0x1D6D530;
-	//int qte : "gamedll_x64_rwdi.dll", 0x1C6B9E0, 0x780, 0xB98, 0xB8;
-	int loading : "rd3d11_x64_rwdi.dll", 0x7D108; // Thanks to Mr.Brood for this one.
+	int startPoint: "engine_x64_rwdi.dll", 0xAB0CE4;
 }
 
 update
 {
 	vars.StoryWatch.Update(game);
+	vars.startTimer.Update(game);
 	if(!vars.baseFound){
 		if(vars.StoryWatch.Old == 0 && vars.StoryWatch.Changed){
 			int checkpointBase = vars.StoryWatch.Current;
 			// Check for DLC (30 is no DLC, anything else is)
-			if(vars.StoryWatch.Current == 30){
+			print("" + vars.StoryWatch.Current);
+			if(vars.StoryWatch.Current == 75){
 				SortedList<int, string> checkpoints = new SortedList<int, string>(){
-					{checkpointBase += 18, "Quartermaster & Zere"}, // + 18
-					{checkpointBase += 27, "First Assignment"}, // + 27
-					{checkpointBase += 3, "Call GRE"}, // + 3
 					{checkpointBase += 15, "Brecken's Booboo"}, // + 15
 					{checkpointBase += 12, "Empty airdrop"}, // + 12
 					{checkpointBase += 5, "Real airdrop"}, // + 5
@@ -56,12 +53,9 @@ update
 					{checkpointBase += 1, "No Loose Ends"}, // + 1	
 				};
 				vars.checkpoints = checkpoints;
-			} else {
+			} else if(vars.StoryWatch.Current == 76){
 				SortedList<int, string> checkpoints = new SortedList<int, string>(){
-					{checkpointBase += 18, "Quartermaster & Zere"}, // + 18
-					{checkpointBase += 27, "First Assignment"}, // + 27
-					{checkpointBase += 4, "Call GRE"}, // + 4
-					{checkpointBase += 15, "Brecken's Booboo"}, // + 15
+					{checkpointBase += 24, "Brecken's Booboo"}, // + 15
 					{checkpointBase += 12, "Empty airdrop"}, // + 12
 					{checkpointBase += 5, "Real airdrop"}, // + 5
 					{checkpointBase += 6, "Return to hot babe"}, // + 6
@@ -110,6 +104,10 @@ update
 					{checkpoints.Values[checkpoints.Count - 1], 10},
 				};
 				
+				foreach(var test in exceptions){
+					print("exception-" + test.Key + ": " + test.Value);
+				}
+				
 				vars.checkpoints = checkpoints;
 				vars.exceptions = exceptions;
 				vars.baseFound = true;
@@ -121,39 +119,15 @@ update
 			}
 		}
 	}
-	
-	/*if((old.qte == 1 || old.qte == 2) && current.qte == 0){
-		vars.used = false;
-	}*/
 }
 
 init
 {
+	vars.startTimer = new MemoryWatcher<int>(new DeepPointer("steam_api64.dll", 0x36478)); // need 7 changes
+	vars.StoryWatch = new MemoryWatcher<int>(new DeepPointer("gamedll_x64_rwdi.dll", 0x1D6D540));
 	vars.isPaused = (Func<bool>)(() => {
 		return current.loading == 240;
 	});
-	/*vars.EndSplit = (Func<bool>)(() =>
-	{
-		if(vars.endQteCompleted < 1 && current.qte == 1){
-			vars.endQteCompleted = 1;
-			vars.used = true;
-		} else if(vars.endQteCompleted > 0 && !vars.used){
-			if(current.qte == 1){
-				vars.endQteCompleted = vars.endQteCompleted + 1;
-				vars.used = true;
-			} else if(vars.isPaused() || current.qte == 2){
-				if(vars.endQteCompleted < 3){
-					vars.endQteCompleted = 1;
-				} else if(vars.endQteCompleted > 3 && vars.endQteCompleted < 6){
-					vars.endQteCompleted = 2;
-				}
-			}
-		}
-		
-		return vars.endQteCompleted == 8;
-	});*/
-	
-	vars.StoryWatch = new MemoryWatcher<int>(new DeepPointer("gamedll_x64_rwdi.dll", 0x1D7AF80));
 	
 	vars.PrintProgression = (Action)(() =>
 	{
@@ -171,7 +145,7 @@ init
 	{
 		SortedList<string, int> exceptions = vars.exceptions;
 		if(exceptions.ContainsKey(expectedProgression.Value)){
-			if((currentProgression == expectedProgression.Key) || (currentProgression == expectedProgression.Key + exceptions[expectedProgression.Value])){
+			if(currentProgression == expectedProgression.Key || currentProgression == (expectedProgression.Key + exceptions[expectedProgression.Value])){
 				return true;
 			} else {
 				return false;
@@ -182,67 +156,10 @@ init
 			return false;
 		}
 	});
-	
-	int amntCheckpoints = 0;
-	foreach(string split in vars.splits){
-		if(settings[split]){
-			amntCheckpoints++;
-		}
-	}
-
-	vars.amntCheckpoints = amntCheckpoints;
 }
 
 startup
 {
-	settings.Add("checkpoints", true, "---Splits---");
-	vars.splits = new string[]{
-		"Quartermaster & Zere",
-		"First Assignment",
-		"Call GRE",
-		"Brecken's Booboo",
-		"Empty airdrop",
-		"Real airdrop",
-		"Return to hot babe",
-		"Talk to bff",
-		"Radio tower 1",
-		"Radio tower 2 and Karim",
-		"Jaffar and Gursel",
-		"Fishermen village",
-		"Karim's love letter",
-		"RUSH B BLYAT",
-		"Beg for antizin",
-		"School shooter",
-		"Show Rahim your explosives",
-		"Hunt Green Goblin",
-		"Explosive business",
-		"Fix Rahim's mess",
-		"Rais' Garrison",
-		"Get to parking lot",
-		"Cut Rais' hand off",
-		"Run from Pirate Rais",
-		"Go to Saviours",
-		"Get to the tunnel",
-		"Run to Old Town",
-		"Get to Troy",
-		"Go to University",
-		"Get to sewers1",
-		"Meet chicken shit Michael",
-		"Smiley Face",
-		"Museum Curator",
-		"History Parkour",
-		"Zombie LSD",
-		"Get to sewers2",
-		"It's radio time",
-		"Run to Camden's Clinic",
-		"Camden's Dungeon",
-		"No Loose Ends",
-	};
-	
-	foreach(string split in vars.splits){
-		settings.Add(split, true, split, "checkpoints");
-	}
-	
 	vars.endQteCompleted = 0;
 	vars.used = false;
 	vars.baseFound = false;
@@ -274,8 +191,8 @@ startup
 		vars.baseFound = false;
 		vars.split = 0;
 		vars.checkpoints = null;
-		vars.exceptions.Clear();
 		vars.pastCheckpoints.Clear();
+		vars.exceptions.Clear();
 		using (System.IO.StreamWriter sw = File.AppendText(vars.dlFolder + "progressions.txt"))
 		{
 			sw.WriteLine("------ END OF RUN ------" + System.Environment.NewLine);
@@ -287,14 +204,19 @@ startup
     timer.OnReset += vars.timer_OnReset;
 }
 
+start
+{
+	return(old.startPoint == 3 && current.startPoint == 4);
+}
+
 split
 {	
 	if(vars.baseFound && vars.checkpoints != null){
 		SortedList<int, string> checkpoints = vars.checkpoints;
 
-		if(vars.pastCheckpoints.Count < vars.amntCheckpoints){
+		if(vars.pastCheckpoints.Count < checkpoints.Count){
 			foreach(var checkpoint in checkpoints){
-				if(settings[checkpoint.Value] && vars.HasProgressed(vars.StoryWatch.Current, checkpoint) && !vars.pastCheckpoints.Contains(checkpoint.Value)){
+				if(vars.HasProgressed(vars.StoryWatch.Current, checkpoint) && !vars.pastCheckpoints.Contains(checkpoint.Value)){
 					vars.pastCheckpoints.Add(checkpoint.Value);
 					vars.PrintProgression();
 					return true;
@@ -304,10 +226,9 @@ split
 			if(vars.StoryWatch.Current != 0 && vars.StoryWatch.Changed){
 				vars.PrintProgression();
 			}
-		}
-		/*else {
+		} else {
 			return vars.EndSplit();
-		}*/
+		}
 	}
 }
 
