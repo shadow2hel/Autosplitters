@@ -124,7 +124,7 @@ update
 init
 {
 	vars.startTimer = new MemoryWatcher<int>(new DeepPointer("steam_api64.dll", 0x36478)); // need 7 changes
-	vars.StoryWatch = new MemoryWatcher<int>(new DeepPointer("gamedll_x64_rwdi.dll", 0x1D6D540));
+	vars.StoryWatch = new MemoryWatcher<int>(new DeepPointer("gamedll_x64_rwdi.dll", 0x1D7AF80));
 	vars.isPaused = (Func<bool>)(() => {
 		return current.loading == 240;
 	});

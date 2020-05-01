@@ -1,6 +1,5 @@
 state("DyingLightGame")
 {
-	//old int progression : "gamedll_x64_rwdi.dll", 0x1D6D530;
 	//int qte : "gamedll_x64_rwdi.dll", 0x1C6B9E0, 0x780, 0xB98, 0xB8;
 	int loading : "rd3d11_x64_rwdi.dll", 0x7D108; // Thanks to Mr.Brood for this one.
 }
@@ -153,6 +152,7 @@ init
 		return vars.endQteCompleted == 8;
 	});*/
 	
+	// PROGRESSION ADDRESS
 	vars.StoryWatch = new MemoryWatcher<int>(new DeepPointer("gamedll_x64_rwdi.dll", 0x1D7AF80));
 	
 	vars.PrintProgression = (Action)(() =>
