@@ -8,6 +8,7 @@ update
 {
 	vars.StoryWatch.Update(game);
 	vars.startTimer.Update(game);
+	vars.EndWatch.Update(game);
 	if(!vars.baseFound){
 		if(vars.StoryWatch.Old == 0 && vars.StoryWatch.Changed){
 			int checkpointBase = vars.StoryWatch.Current;
@@ -123,6 +124,7 @@ init
 	
 	vars.startTimer = new MemoryWatcher<int>(new DeepPointer("engine_x64_rwdi.dll", 0xA2E4F8, 0xFC));
 	vars.StoryWatch = new MemoryWatcher<int>(new DeepPointer("gamedll_x64_rwdi.dll", 0x1D7AF80));
+	vars.EndWatch = new MemoryWatcher<int>(new DeepPointer("gamedll_x64_rwdi.dll", 0x1C781C8, 0x38, 0x4E8, 0x1B0, 0x10, 0x58));
 	vars.isPaused = (Func<bool>)(() => {
 		return current.loading == 240;
 	});
@@ -153,6 +155,11 @@ init
 		} else {
 			return false;
 		}
+	});
+
+	vars.EndSplit = (Func<bool>)(() =>
+	{
+		return vars.EndWatch.Current == 36;
 	});
 }
 
@@ -214,7 +221,6 @@ split
 {	
 	if(vars.baseFound && vars.checkpoints != null){
 		SortedList<int, string> checkpoints = vars.checkpoints;
-
 		if(vars.pastCheckpoints.Count < checkpoints.Count){
 			foreach(var checkpoint in checkpoints){
 				if(vars.HasProgressed(vars.StoryWatch.Current, checkpoint) && !vars.pastCheckpoints.Contains(checkpoint.Value)){
@@ -223,7 +229,6 @@ split
 					return true;
 				}
 			}
-			
 			if(vars.StoryWatch.Current != 0 && vars.StoryWatch.Changed){
 				vars.PrintProgression();
 			}
