@@ -1,6 +1,7 @@
 state("DyingLightGame")
 {
-	int startPoint: "engine_x64_rwdi.dll", 0xAB0CE4;
+	// int startPoint: "engine_x64_rwdi.dll", 0xAB0CE4;
+	// int newStart: "engine_x64_rwdi.dll", 0xA2E4F8, 0xFC;
 }
 
 update
@@ -11,8 +12,7 @@ update
 		if(vars.StoryWatch.Old == 0 && vars.StoryWatch.Changed){
 			int checkpointBase = vars.StoryWatch.Current;
 			// Check for DLC (30 is no DLC, anything else is)
-			print("" + vars.StoryWatch.Current);
-			if(vars.StoryWatch.Current == 75){
+			if(vars.StoryWatch.Current == 85){
 				SortedList<int, string> checkpoints = new SortedList<int, string>(){
 					{checkpointBase += 15, "Brecken's Booboo"}, // + 15
 					{checkpointBase += 12, "Empty airdrop"}, // + 12
@@ -52,10 +52,12 @@ update
 					{checkpointBase += 10, "Camden's Dungeon"}, // + 10
 					{checkpointBase += 1, "No Loose Ends"}, // + 1	
 				};
+				vars.baseFound = true;
 				vars.checkpoints = checkpoints;
-			} else if(vars.StoryWatch.Current == 76){
+				
+			} else if(vars.StoryWatch.Current == 86){
 				SortedList<int, string> checkpoints = new SortedList<int, string>(){
-					{checkpointBase += 24, "Brecken's Booboo"}, // + 15
+					{checkpointBase += 14, "Brecken's Booboo"}, // + 15
 					{checkpointBase += 12, "Empty airdrop"}, // + 12
 					{checkpointBase += 5, "Real airdrop"}, // + 5
 					{checkpointBase += 6, "Return to hot babe"}, // + 6
@@ -111,11 +113,6 @@ update
 				vars.checkpoints = checkpoints;
 				vars.exceptions = exceptions;
 				vars.baseFound = true;
-				using (System.IO.StreamWriter sw = File.AppendText(vars.dlFolder + "ExpectedProgressions.txt")){
-					foreach(KeyValuePair<int, string> checkpoint in checkpoints){
-						sw.WriteLine(checkpoint.Key + " -- " + checkpoint.Value);
-					}
-				}
 			}
 		}
 	}
@@ -123,7 +120,8 @@ update
 
 init
 {
-	vars.startTimer = new MemoryWatcher<int>(new DeepPointer("steam_api64.dll", 0x36478)); // need 7 changes
+	// OLD vars.startTimer = new MemoryWatcher<int>(new DeepPointer("steam_api64.dll", 0x36478)); // need 7 changes
+	vars.startTimer = new MemoryWatcher<int>(new DeepPointer("engine_x64_rwdi.dll", 0xA2E4F8, 0xFC));
 	vars.StoryWatch = new MemoryWatcher<int>(new DeepPointer("gamedll_x64_rwdi.dll", 0x1D7AF80));
 	vars.isPaused = (Func<bool>)(() => {
 		return current.loading == 240;
@@ -180,6 +178,9 @@ startup
 		}
 		using (System.IO.StreamWriter sw = File.AppendText(vars.dlFolder + "ExpectedProgressions.txt")){
 			sw.WriteLine("------ START (" + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + ") ------");
+			foreach(KeyValuePair<int, string> checkpoint in vars.checkpoints){
+				sw.WriteLine(checkpoint.Key + " -- " + checkpoint.Value);
+			}
 		}
     });
 	timer.OnStart += vars.timer_OnStart;
@@ -206,7 +207,7 @@ startup
 
 start
 {
-	return(old.startPoint == 3 && current.startPoint == 4);
+	return (vars.startTimer.Old == 0 && vars.startTimer.Current == 2);
 }
 
 split

@@ -55,6 +55,7 @@ update
 					{checkpointBase += 1, "No Loose Ends"}, // + 1	
 				};
 				vars.checkpoints = checkpoints;
+				vars.baseFound = true;
 			} else {
 				SortedList<int, string> checkpoints = new SortedList<int, string>(){
 					{checkpointBase += 18, "Quartermaster & Zere"}, // + 18
