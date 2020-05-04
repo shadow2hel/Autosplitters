@@ -1,7 +1,7 @@
 state("DyingLightGame")
 {
-	// int startPoint: "engine_x64_rwdi.dll", 0xAB0CE4;
-	// int newStart: "engine_x64_rwdi.dll", 0xA2E4F8, 0xFC;
+	
+	
 }
 
 update
@@ -11,7 +11,7 @@ update
 	if(!vars.baseFound){
 		if(vars.StoryWatch.Old == 0 && vars.StoryWatch.Changed){
 			int checkpointBase = vars.StoryWatch.Current;
-			// Check for DLC (30 is no DLC, anything else is)
+			// Check for DLC (85 is no DLC, everything else is)
 			if(vars.StoryWatch.Current == 85){
 				SortedList<int, string> checkpoints = new SortedList<int, string>(){
 					{checkpointBase += 15, "Brecken's Booboo"}, // + 15
@@ -120,7 +120,7 @@ update
 
 init
 {
-	// OLD vars.startTimer = new MemoryWatcher<int>(new DeepPointer("steam_api64.dll", 0x36478)); // need 7 changes
+	
 	vars.startTimer = new MemoryWatcher<int>(new DeepPointer("engine_x64_rwdi.dll", 0xA2E4F8, 0xFC));
 	vars.StoryWatch = new MemoryWatcher<int>(new DeepPointer("gamedll_x64_rwdi.dll", 0x1D7AF80));
 	vars.isPaused = (Func<bool>)(() => {
