@@ -20,3 +20,4 @@ isLoading
 	return vars.isLoading;
 }
 
+
