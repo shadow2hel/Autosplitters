@@ -8,7 +8,7 @@ update
 {
 	vars.StoryWatch.Update(game);
 	if(!vars.baseFound){
-		if(vars.StoryWatch.Old == 0 && vars.StoryWatch.Changed){
+		if(vars.StoryWatch.Changed){
 			int checkpointBase = vars.StoryWatch.Current;
 			// Check for DLC (30 is no DLC, anything else is)
 			if(vars.StoryWatch.Current == 30){
@@ -56,7 +56,7 @@ update
 				};
 				vars.checkpoints = checkpoints;
 				vars.baseFound = true;
-			} else {
+			} else if(vars.StoryWatch.Current > 30) {
 				SortedList<int, string> checkpoints = new SortedList<int, string>(){
 					{checkpointBase += 18, "Quartermaster & Zere"}, // + 18
 					{checkpointBase += 27, "First Assignment"}, // + 27
@@ -264,6 +264,9 @@ startup
 		}
 		using (System.IO.StreamWriter sw = File.AppendText(vars.dlFolder + "ExpectedProgressions.txt")){
 			sw.WriteLine("------ START (" + DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + ") ------");
+			foreach(KeyValuePair<int, string> checkpoint in vars.checkpoints){
+				sw.WriteLine(checkpoint.Key + " -- " + checkpoint.Value);
+			}
 		}
     });
 	timer.OnStart += vars.timer_OnStart;

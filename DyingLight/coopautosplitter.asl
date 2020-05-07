@@ -10,7 +10,7 @@ update
 	vars.startTimer.Update(game);
 	vars.EndWatch.Update(game);
 	if(!vars.baseFound){
-		if(vars.StoryWatch.Old == 0 && vars.StoryWatch.Changed){
+		if(vars.StoryWatch.Changed){
 			int checkpointBase = vars.StoryWatch.Current;
 			// Check for DLC (85 is no DLC, everything else is)
 			if(vars.StoryWatch.Current == 85){
