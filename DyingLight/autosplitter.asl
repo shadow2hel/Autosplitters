@@ -154,8 +154,8 @@ init
 	});*/
 	
 	// PROGRESSION ADDRESS
-	vars.StoryWatch = new MemoryWatcher<int>(new DeepPointer("gamedll_x64_rwdi.dll", 0x1D7AF80));
-	
+	vars.StoryWatch = new MemoryWatcher<int>(new DeepPointer("gamedll_x64_rwdi.dll", 0x1D9CFA0)); 
+
 	vars.PrintProgression = (Action)(() =>
 	{
 		using (System.IO.StreamWriter sw = File.AppendText(vars.dlFolder + "progressions.txt"))
