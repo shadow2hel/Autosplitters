@@ -26,41 +26,54 @@ startup
     settings.Add("p3", false, "3 Players", "forceCoop");
     settings.Add("p4", false, "4 Players", "forceCoop");
 
+    vars.mode            = "solo";
+    vars.modeLocked      = false;
     vars.maxPlayersSeen  = 1;
     vars.expectedPlayers = 1;
-    print("current level is ");
 }
 
 init
 {
+    vars.mode            = "solo";
+    vars.modeLocked      = false;
     vars.maxPlayersSeen  = 1;
     vars.expectedPlayers = 1;
 }
 
 update
 {
-    if (settings["v155"])
+    // playersCount pointer chain is only valid for 1.55 — skip entirely on 1.47
+    if (!settings["v155"])
+        return;
+
+    int realPlayers = current.playersCount + 1;
+
+    // Track the highest player count seen
+    if (realPlayers >= 1 && realPlayers <= 4)
     {
-        int realPlayers = current.playersCount + 1;
+        if (realPlayers > vars.maxPlayersSeen)
+            vars.maxPlayersSeen = realPlayers;
+    }
 
-        // Track the highest player count seen
-        if (realPlayers >= 1 && realPlayers <= 4)
-        {
-            if (realPlayers > vars.maxPlayersSeen)
-                vars.maxPlayersSeen = realPlayers;
-        }
+    // Determine mode (before run starts)
+    if (!vars.modeLocked)
+    {
+        if (settings["forceSolo"])
+            vars.mode = "solo";
+        else if (settings["forceCoop"])
+            vars.mode = "coop";
+        else // auto
+            vars.mode = (vars.maxPlayersSeen >= 2) ? "coop" : "solo";
+    }
 
-        // Expected player count for coop
+    // Determine expected player count for coop
+    if (vars.mode == "coop")
+    {
         if      (settings["p2"]) vars.expectedPlayers = 2;
         else if (settings["p3"]) vars.expectedPlayers = 3;
         else if (settings["p4"]) vars.expectedPlayers = 4;
         else                     vars.expectedPlayers = vars.maxPlayersSeen;
-        
     }
-}
-
-onStart{
-    vars.maxPlayersSeen = current.playersCount;
 }
 
 start
@@ -69,7 +82,10 @@ start
         return current.start_147 == 2 && old.start_147 != current.start_147;
 
     // 1.55
-    return old.start_155 != 2 && current.start_155 == 2;
+    bool started = old.start_155 != 2 && current.start_155 == 2;
+    if (started)
+        vars.modeLocked = true;
+    return started;
 }
 
 isLoading
@@ -77,28 +93,28 @@ isLoading
     if (settings["v147"])
         return current.loading_147 == 240;
 
-    // 1.55 solo
-    if (settings["forceSolo"] || (!settings["forceCoop"] && vars.maxPlayersSeen < 2))
+    // 1.55
+    if (vars.mode == "solo")
         return current.loading_155 == 240;
 
-    // 1.55 coop
-    return current.loading_155 == 240 || (current.playersCount + 1) < vars.expectedPlayers;
+    if (vars.mode == "coop")
+        return (current.playersCount + 1) < vars.expectedPlayers;
 
-    // 1.55 auto
-    if (vars.maxPlayersSeen >= 2)
-        return current.loading_155 == 240 || (current.playersCount + 1) < vars.maxPlayersSeen;
-    else
-        return current.loading_155 == 240;
+    return false;
 }
 
 exit
 {
+    vars.mode            = "solo";
+    vars.modeLocked      = false;
     vars.maxPlayersSeen  = 1;
     vars.expectedPlayers = 1;
 }
 
-onReset 
+onReset
 {
+    vars.mode            = "solo";
+    vars.modeLocked      = false;
     vars.maxPlayersSeen  = 1;
     vars.expectedPlayers = 1;
 }
