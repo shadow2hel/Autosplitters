@@ -49,7 +49,6 @@ update
             if (realPlayers > vars.maxPlayersSeen)
                 vars.maxPlayersSeen = realPlayers;
         }
-        print("current level is "+ vars.maxPlayersSeen);
 
         // Expected player count for coop
         if      (settings["p2"]) vars.expectedPlayers = 2;
