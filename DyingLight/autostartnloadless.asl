@@ -15,8 +15,8 @@ startup
     refreshRate = 120;
 
     settings.Add("version", true,  "Game Version");
-    settings.Add("v147",    true,  "1.47", "version");
-    settings.Add("v155",    false, "1.55", "version");
+    settings.Add("v147",    false,  "1.47", "version");
+    settings.Add("v155",    true, "1.55", "version");
 
     settings.Add("auto",      true,  "Auto Detect (recommended)", "v155");
     settings.Add("forceSolo", false, "Force Solo",                "v155");
